@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendDora AI</title>
+    <meta name="description" content="SpendDora AI-powered expense tracking with automatic categorization and smart saving suggestions.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ===================== LOGIN SCREEN ===================== -->
+    <div class="login-container" id="login-container">
+        <div class="login-bg-orbs">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+        <div class="login-card">
+            <div class="login-brand">
+                <div class="logo-icon">
+                    <i data-lucide="trending-up"></i>
+                </div>
+                <h2>SpendDora AI</h2>
+            </div>
+            <h3>Welcome Back</h3>
+            <p class="login-subtitle">Sign in to access your AI-powered financial dashboard.</p>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="user"></i>
+                        <input type="text" id="username" placeholder="Enter username" required autocomplete="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+                    </div>
+                </div>
+                <div id="login-error-msg" class="login-error hidden">Invalid username or password. Please try again.</div>
+                <button type="submit" class="submit-btn" id="login-btn">
+                    <span class="btn-text">Sign In to Dashboard</span>
+                    <div class="loader hidden" id="login-loader"></div>
+                </button>
+            </form>
+
+            <div class="credentials-hint">
+                <i data-lucide="info"></i>
+                <span>Demo: <strong>admin</strong> / <strong>password</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== MAIN APP ===================== -->
+    <div class="app-wrapper hidden" id="app-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-icon">
+                    <i data-lucide="trending-up"></i>
+                </div>
+                <span class="brand-name">SpendDora AI</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-tab="dashboard" id="nav-dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-tab="expenses" id="nav-expenses">
+                    <i data-lucide="receipt"></i>
+                    <span>Expenses</span>
+                </button>
+                <button class="nav-btn" data-tab="reports" id="nav-reports">
+                    <i data-lucide="brain-circuit"></i>
+                    <span>AI Insights</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-budget-widget">
+                <div class="widget-header">
+                    <span class="widget-label">Monthly Budget</span>
+                    <button class="icon-btn" id="open-budget-modal" title="Edit budget">
+                        <i data-lucide="edit-3"></i>
+                    </button>
+                </div>
+                <div class="widget-amount" id="sb-budget-display">$0.00</div>
+                <div class="widget-progress-track">
+                    <div class="widget-progress-fill" id="sb-budget-progress"></div>
+                </div>
+                <div class="widget-status" id="sb-budget-status">Set a budget to track usage.</div>
+            </div>
+        </aside>
+
+        <!-- Main Area -->
+        <div class="main-area">
+
+            <!-- Top Navigation Bar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1 class="page-title" id="page-title">Financial Dashboard</h1>
+                    <p class="page-subtitle" id="page-subtitle">Track your wealth and review AI-driven insights.</p>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date">
+                        <i data-lucide="calendar"></i>
+                        <span id="current-date-str"></span>
+                    </div>
+                    <button class="topbar-btn" id="theme-toggle" title="Toggle theme">
+                        <i data-lucide="moon" id="theme-toggle-icon"></i>
+                    </button>
+                    <button class="topbar-btn signout-btn" id="logout-btn" title="Sign out">
+                        <i data-lucide="log-out"></i>
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Budget Exceeded Alert -->
+            <div class="budget-alert hidden" id="budget-alert-banner">
+                <i data-lucide="alert-triangle"></i>
+                <div>
+                    <strong>Budget Exceeded!</strong>
+                    <span>Your monthly spending has surpassed your set limit. Consider pausing non-essential expenses.</span>
+                </div>
+            </div>
+
+            <!-- ===== DASHBOARD TAB ===== -->
+            <section class="tab-panel active" id="tab-dashboard">
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-card accent-violet">
+                        <div class="stat-icon"><i data-lucide="wallet"></i></div>
+                        <div class="stat-body">
+                            <span class="stat-label">Total Expenses</span>
+                            <div class="stat-value" id="card-total-val">$0.00</div>
+                            <div class="stat-meta"><i data-lucide="history"></i> All-time tracked</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-cyan">
+                        <div class="stat-icon"><i data-lucide="calendar-range"></i></div>
+                        <div class="stat-body">
+                            <span class="stat-label">Today's Expenses</span>
+                            <div class="stat-value" id="card-today-val">$0.00</div>
+                            <div class="stat-meta"><i data-lucide="sparkles"></i> Today's total</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-indigo">
+                        <div class="stat-icon"><i data-lucide="dollar-sign"></i></div>
+                        <div class="stat-body">
+                            <span class="stat-label">Monthly Expenses</span>
+                            <div class="stat-value" id="card-month-val">$0.00</div>
+                            <div class="stat-meta"><i data-lucide="calendar-days"></i> <span id="current-month-lbl">This month</span></div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-emerald" id="budget-card">
+                        <div class="stat-icon" id="budget-card-icon"><i data-lucide="percent"></i></div>
+                        <div class="stat-body">
+                            <span class="stat-label">Budget Remaining</span>
+                            <div class="stat-value" id="card-budget-val">$0.00</div>
+                            <div class="stat-meta" id="budget-indicator-text"><i data-lucide="activity"></i> Within allowance</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts — Vertical Stack -->
+                <div class="dashboard-stack">
+
+                    <!-- Pie Chart -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Category Distribution</h3>
+                                <p>Proportional spending breakdown this month</p>
+                            </div>
+                        </div>
+                        <div class="chart-area">
+                            <canvas id="categoryPieChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Bar Chart -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Category Comparison</h3>
+                                <p>Bar-by-bar expense amounts per category</p>
+                            </div>
+                        </div>
+                        <div class="chart-area">
+                            <canvas id="categoryBarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Actions -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Recent Actions</h3>
+                                <p>Last 5 logged transactions</p>
+                            </div>
+                            <button class="link-btn" id="goto-expenses-btn">View All</button>
+                        </div>
+                        <div class="activity-list" id="dashboard-recent-expenses">
+                            <div class="empty-state">No expenses recorded yet.</div>
+                        </div>
+                    </div>
+
+                    <!-- Highest Spending Category -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Highest Spending Category</h3>
+                                <p>Where most of your budget goes</p>
+                            </div>
+                        </div>
+                        <div class="peak-category-box">
+                            <div class="peak-ring" id="highest-cat-ring">
+                                <i data-lucide="alert-circle" id="highest-cat-icon"></i>
+                                <span id="highest-cat-name">None</span>
+                            </div>
+                            <p class="peak-desc" id="highest-cat-desc">
+                                Add daily expenses to discover your highest spending category.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ===== EXPENSES TAB ===== -->
+            <section class="tab-panel" id="tab-expenses">
+
+                <!-- Add Expense Form -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div>
+                            <h3>Log New Expense</h3>
+                            <p>Gemini AI will automatically categorize and suggest savings tips.</p>
+                        </div>
+                    </div>
+                    <form id="expense-form" class="expense-form-inline">
+                        <div class="form-group">
+                            <label for="expense_name">Expense Name</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="tag"></i>
+                                <input type="text" id="expense_name" name="expense_name" placeholder="e.g. Starbucks Latte, Uber to Airport" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount ($)</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="dollar-sign"></i>
+                                <input type="number" id="amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="form-submit-col">
+                            <label class="invisible-label">&nbsp;</label>
+                            <button type="submit" class="submit-btn" id="add-btn">
+                                <i data-lucide="plus-circle"></i>
+                                <span class="btn-text">Add Expense</span>
+                                <div class="loader hidden" id="form-loader"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Expense Ledger -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div>
+                            <h3>Expense History Ledger</h3>
+                            <p id="ledger-count">0 items tracked</p>
+                        </div>
+                    </div>
+
+                    <!-- Search Bar + Button -->
+                    <div class="search-row">
+                        <div class="search-input-wrap">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="expense-search-input" placeholder="Search by name, category, or date...">
+                        </div>
+                        <button class="search-btn" id="expense-search-btn">
+                            <i data-lucide="search"></i>
+                            Search
+                        </button>
+                    </div>
+
+                    <div class="table-scroll">
+                        <table class="data-table" id="expenses-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Expense Name</th>
+                                    <th>Amount</th>
+                                    <th>Category</th>
+                                    <th>AI Savings Suggestion</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenses-table-body">
+                                <tr><td colspan="6" class="table-empty">Loading transactions...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ===== REPORTS TAB ===== -->
+            <section class="tab-panel" id="tab-reports">
+
+                <!-- Summary Cards Row -->
+                <div class="report-summary-row">
+                    <div class="glass-card report-meta-card">
+                        <span class="rm-label">Monthly Budget</span>
+                        <span class="rm-value" id="report-budget-val">$0.00</span>
+                    </div>
+                    <div class="glass-card report-meta-card">
+                        <span class="rm-label">Total Spent This Month</span>
+                        <span class="rm-value text-cyan" id="report-spent-val">$0.00</span>
+                    </div>
+                    <div class="glass-card report-meta-card">
+                        <span class="rm-label">Highest Spending Segment</span>
+                        <span class="rm-value text-amber" id="report-highest-cat">—</span>
+                    </div>
+                </div>
+
+                <!-- AI Analysis Card -->
+                <div class="glass-card ai-card">
+                    <div class="card-header">
+                        <div class="ai-title-row">
+                            <i data-lucide="brain-circuit" class="ai-icon"></i>
+                            <div>
+                                <h3>AI Spending Analysis</h3>
+                                <p>Powered by Gemini AI</p>
+                            </div>
+                        </div>
+                        <span class="ai-badge">Gemini</span>
+                    </div>
+                    <div class="ai-content">
+                        <p class="ai-loading" id="ai-analysis-loading"><span class="spinner"></span> Analyzing your budget patterns...</p>
+                        <div class="ai-text hidden" id="ai-analysis-text"></div>
+                    </div>
+                </div>
+
+                <!-- AI Suggestions Card -->
+                <div class="glass-card ai-card suggestions-card">
+                    <div class="card-header">
+                        <div class="ai-title-row">
+                            <i data-lucide="sparkles" class="ai-icon secondary"></i>
+                            <div>
+                                <h3>AI Smart Recommendations</h3>
+                                <p>Personalized saving strategies</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ai-content">
+                        <p class="ai-loading" id="ai-suggestion-loading"><span class="spinner"></span> Gathering saving suggestions...</p>
+                        <div class="ai-text hidden" id="ai-suggestion-text"></div>
+                    </div>
+                </div>
+
+                <!-- Category Breakdown -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div>
+                            <h3>Category-wise Breakdown</h3>
+                            <p>Monthly expense totals, percentages, and budget impact</p>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Total Expenditure</th>
+                                    <th>% of Budget</th>
+                                    <th>Budget Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-table-body">
+                                <tr><td colspan="4" class="table-empty">No data for this month yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+        </div><!-- /.main-area -->
+    </div><!-- /#app-container -->
+
+    <!-- ===== MODAL: Budget ===== -->
+    <div class="modal-overlay hidden" id="budget-modal">
+        <div class="modal-box">
+            <div class="modal-top">
+                <h3>Set Monthly Budget</h3>
+                <button class="icon-btn" id="close-budget-modal"><i data-lucide="x"></i></button>
+            </div>
+            <form id="budget-form" class="modal-form">
+                <div class="form-group">
+                    <label for="monthly_budget_input">Budget Limit ($)</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="piggy-bank"></i>
+                        <input type="number" id="monthly_budget_input" step="0.01" min="0" placeholder="e.g. 1500.00" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-ghost" id="cancel-budget-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Update Budget</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: Edit Expense ===== -->
+    <div class="modal-overlay hidden" id="edit-expense-modal">
+        <div class="modal-box">
+            <div class="modal-top">
+                <h3>Edit Expense</h3>
+                <button class="icon-btn" id="close-edit-modal"><i data-lucide="x"></i></button>
+            </div>
+            <form id="edit-expense-form" class="modal-form">
+                <input type="hidden" id="edit-expense-id">
+                <div class="form-group">
+                    <label for="edit-expense-name">Expense Name</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="tag"></i>
+                        <input type="text" id="edit-expense-name" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-expense-amount">Amount ($)</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="dollar-sign"></i>
+                        <input type="number" id="edit-expense-amount" step="0.01" min="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-expense-category">Category</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="folder"></i>
+                        <input type="text" id="edit-expense-category" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-expense-suggestion">AI Savings Suggestion</label>
+                    <div class="textarea-wrapper">
+                        <textarea id="edit-expense-suggestion" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-ghost" id="cancel-edit-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
