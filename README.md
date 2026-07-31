@@ -3,7 +3,7 @@
 ApexWealth AI Expense Tracking Agent is a full-stack, production-ready expense management system. It utilizes FastAPI, MySQL, and Google Gemini AI (with a built-in heuristic local fallback) to automatically classify expenses and provide smart saving suggestions, rendering them in a beautiful, responsive dark-themed dashboard.
 
 ## 🚀 Key Features
-- **Auto-Categorization**: Enter an expense name (e.g. *Pizza*, *Uber*, *Laptop*) and Gemini AI will automatically categorize it (e.g. *Food*, *Transport*, *Electronics*).
+- **Auto-Categorization**: Enter an expense name (e.g. *Pizza*, *Uber*, *Laptop*) and Gemini AI will automatically categorize it (e.g. *Food*, *Transport*, *Electronics*)...
 - **Smart Savings Advice**: Get tailored, short savings recommendations for every logged item.
 - **Interactive Dashboard**: Track total, today's, and monthly spending aggregates, monitor remaining budget allowances, and view top categories.
 - **Exceeded Budget Protection**: Enter a monthly spending limit. If your monthly expenses surpass this allowance, a warnings banner flashes red.
