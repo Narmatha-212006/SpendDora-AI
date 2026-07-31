@@ -12,7 +12,6 @@ ApexWealth AI Expense Tracking Agent is a full-stack, production-ready expense m
 - **Full CRUD Support**: Add, update, view, or delete records.
 
 ---
-
 ## 🛠️ Technology Stack
 - **Backend Framework**: Python 3.11 with FastAPI & Uvicorn
 - **ORM & Driver**: SQLAlchemy & PyMySQL
