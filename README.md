@@ -8,7 +8,7 @@ ApexWealth AI Expense Tracking Agent is a full-stack, production-ready expense m
 - **Interactive Dashboard**: Track total, today's, and monthly spending aggregates, monitor remaining budget allowances, and view top categories.
 - **Exceeded Budget Protection**: Enter a monthly spending limit. If your monthly expenses surpass this allowance, a warnings banner flashes red.
 - **Dynamic Charting**: Renders spending distribution dynamically with Chart.js (Pie and Bar comparisons).
-- **Universal History Ledger**: Search through all logged expenses by description, category, or timestamp instantly.
+- **Universal History Ledger**: Search through all logged expenses by description, category, or timestamp instantly
 - **Full CRUD Support**: Add, update, view, or delete records.
 
 ---
