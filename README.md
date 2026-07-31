@@ -98,7 +98,7 @@ uvicorn backend.main:app --reload
 Open your web browser and navigate to:
 [http://localhost:8000](http://localhost:8000)
 
---
+---
 
 ## 📡 API Documentation
 Once the server is running, interactive API docs can be viewed at:
